@@ -6,9 +6,8 @@ const path = require('path');
 const fs = require('fs');
 // UNICO_MOCK=1 usa il simulatore dei dispositivi (solo per sviluppo, non incluso nel pacchetto)
 const HID = process.env.UNICO_MOCK ? require('../test/fake-hid').createFakeHid() : require('node-hid');
-const { RazerMouse } = require('./devices/razer');
-const { Hs80 } = require('./devices/hs80');
-const { AulaKeyboard, MODES, SLEEP } = require('./devices/aula');
+// Nessuna periferica di questo PC ha un driver: vedi src/devices/none.js
+const { NoDevice, MODES, SLEEP } = require('./devices/none');
 const apo = require('./eq/apo');
 const { Phone, FakePhone } = require('./phone/scrcpy');
 const sysmod = require('./system');
@@ -110,9 +109,9 @@ if (!settings.fixV27) { settings.headset.customLeds = false; settings.fixV27 = t
 if (!settings.appearance.v) { if (settings.appearance.background === 'mica') settings.appearance.background = 'acrylic'; settings.appearance.v = 2; }
 // i profili salvati sostituiscono quelli predefiniti solo se presenti
 for (const k of Object.keys(DEFAULT_PROFILES)) if (!settings.profiles[k]) settings.profiles[k] = DEFAULT_PROFILES[k];
-const mouse = new RazerMouse(HID, log);
-const headset = new Hs80(HID, log);
-const keyboard = new AulaKeyboard(HID, log);
+const mouse = new NoDevice('Mouse');
+const headset = new NoDevice('Cuffie');
+const keyboard = new NoDevice('Tastiera');
 function phoneBinDir() {
   const bundled = app.isPackaged ? path.join(process.resourcesPath, 'scrcpy') : path.join(__dirname, '..', 'vendor', 'scrcpy');
   if (MOCK || !app.isPackaged) return bundled;
@@ -646,15 +645,14 @@ handle('remote:pin', async () => { if (!settings.remote.enabled) return { ok: fa
 handle('remote:forget', async () => { remote.forgetAll(); return remote.info(); });
 handle('remote:open', async (url) => { if (/^http:\/\/[\d.]+:\d+$/.test(String(url))) shell.openExternal(url); return { ok: true }; });
 
-// iCUE aperto = le cuffie sono sue
+// iCUE aperto (su questo PC nessuna periferica Corsair: non blocca niente)
 let icueOpen = null;
 async function checkIcue(names) {
   const open = (names || []).some((n) => /^icue$/i.test(String(n)));
   if (open === icueOpen) return;
   icueOpen = open;
-  await headset.setBlocked(open);
-  state.headset = open ? { connected: true, managed: 'iCUE', name: 'Corsair HS80 RGB Wireless' } : state.headset;
-  if (!open) { await refresh(['headset']); await restoreHeadsetLeds(); } else push();
+  // su questo PC non ci sono cuffie Corsair: si tiene solo traccia di iCUE per la diagnostica
+  push();
 }
 
 // --- IPC ----------------------------------------------------------------------
@@ -802,7 +800,8 @@ handle('app:setKey', async ({ key, value }) => {
 });
 handle('diag:devices', async () => {
   const all = await HID.devicesAsync();
-  const known = all.filter((d) => [0x1532, 0x1b1c, 0x0c45].includes(d.vendorId) || (d.vendorId === 0x05ac && d.productId === 0x024f));
+  // periferiche di questo PC: ricevitore tastiera+mouse 1d57:fa60 ed EarPods 05ac:110b
+  const known = all.filter((d) => (d.vendorId === 0x1d57 && d.productId === 0xfa60) || (d.vendorId === 0x05ac && d.productId === 0x110b));
   return known.map((d) => ({
     id: `${hex(d.vendorId)}:${hex(d.productId)}`, product: d.product || '', manufacturer: d.manufacturer || '',
     usage: `${hex(d.usagePage)}:${hex(d.usage)}`, interface: d.interface,

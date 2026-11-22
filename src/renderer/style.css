@@ -275,6 +275,7 @@ td { font-family: "Cascadia Mono", Consolas, monospace; }
 .dock { position: fixed; left: 50%; bottom: 22px; transform: translateX(-50%); display: flex; gap: 4px; padding: 7px; border-radius: 999px; z-index: 20; }
 .dock button { all: unset; position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 9px 18px 7px; border-radius: 999px; cursor: pointer; color: var(--muted); font-size: 11px; min-width: 64px; transition: color .25s; }
 .dock button.on { color: var(--text); }
+.dock button[hidden] { display: none; }
 .dock button svg { transition: transform .35s cubic-bezier(.3, 1.6, .5, 1); }
 .dock button.on svg { transform: translateY(-1px) scale(1.08); }
 .dock .blob { top: 7px; bottom: 7px; left: 7px; }
@@ -638,3 +639,5 @@ input[type=range]::-webkit-slider-runnable-track { background: linear-gradient(9
 .modal .modal-card, .modal .picker-card { background: var(--base); box-shadow: 0 0 0 1px var(--line-strong), 0 24px 60px -24px rgba(0, 0, 0, .6); }
 .switch span::after { background: #fff; box-shadow: 0 1px 3px rgba(0, 0, 0, .25); }
 .rm-code { font: 700 22px/1 "Segoe UI Variable Display", "Segoe UI", sans-serif; letter-spacing: .08em; font-variant-numeric: tabular-nums; }
+.device[hidden] { display: none !important; }
+.lights-card[hidden] { display: none !important; }

@@ -233,7 +233,8 @@ function renderHome() {
   const n = ['mouse', 'headset', 'keyboard'].filter((k) => online(S[k])).length;
   const h = new Date().getHours();
   $('#greeting').textContent = h < 13 ? 'Buongiorno' : h < 18 ? 'Buon pomeriggio' : 'Buonasera';
-  $('#home-sub').textContent = n === 3 ? 'Tutte e tre le periferiche sono collegate.' : `${n} periferiche su 3 collegate.`;
+  // su questo PC nessuna periferica ha un driver: niente conteggio "0 su 3"
+  $('#home-sub').textContent = n ? `${n} periferiche collegate.` : '';
 
   // controlli rapidi
   const qm = $('#quick-mouse');

@@ -39,19 +39,19 @@
         <p class="sub" id="home-sub">Tutto in un posto, senza programmi pesanti in background.</p>
       </div>
       <div class="device-grid">
-        <article class="device glass refract" data-go="mouse">
+        <article class="device glass refract" data-go="mouse" hidden>
           <div class="device-top"><span class="device-ico"><svg viewBox="0 0 24 24"><rect x="6" y="3" width="12" height="18" rx="6"/><path d="M12 7v4"/></svg></span><span class="chip" id="chip-mouse">…</span></div>
           <div class="ring" id="ring-mouse"><span>—</span></div>
           <h2>Mouse</h2><p class="muted" id="sum-mouse">Ricerca…</p>
           <div class="quick" id="quick-mouse"></div>
         </article>
-        <article class="device glass refract" data-go="headset">
+        <article class="device glass refract" data-go="headset" hidden>
           <div class="device-top"><span class="device-ico"><svg viewBox="0 0 24 24"><path d="M4 15v-3a8 8 0 0 1 16 0v3"/><rect x="3" y="14" width="4" height="6" rx="2"/><rect x="17" y="14" width="4" height="6" rx="2"/></svg></span><span class="chip" id="chip-headset">…</span></div>
           <div class="ring" id="ring-headset"><span>—</span></div>
           <h2>Cuffie</h2><p class="muted" id="sum-headset">Ricerca…</p>
           <div class="quick" id="quick-headset"></div>
         </article>
-        <article class="device glass refract" data-go="keyboard">
+        <article class="device glass refract" data-go="keyboard" hidden>
           <div class="device-top"><span class="device-ico"><svg viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="3"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M7 14h10"/></svg></span><span class="chip" id="chip-keyboard">…</span></div>
           <div class="ring" id="ring-keyboard"><span>—</span></div>
           <h2>Tastiera</h2><p class="muted" id="sum-keyboard">Ricerca…</p>
@@ -82,7 +82,7 @@
           </div>
         </div>
       </div>
-      <div class="card glass lights-card">
+      <div class="card glass lights-card" hidden>
         <div class="card-head"><div><h3>Luci di tutte le periferiche</h3><p class="muted">Un colore e un effetto per rotella del mouse, cuffie e tastiera insieme.</p></div>
           <div class="row"><input type="color" id="ls-color"><button class="btn primary" id="ls-apply">Applica a tutte</button></div></div>
         <div class="chips" id="ls-effect"><button data-v="off">Spente</button><button data-v="static">Fisse</button><button data-v="breathing">Respiro</button><button data-v="spectrum">Arcobaleno</button></div>
@@ -666,9 +666,9 @@
   <nav class="dock glass refract" id="dock">
     <span class="blob"></span>
     <button data-page="home" class="on" title="Panoramica"><svg viewBox="0 0 24 24"><path d="M4 11l8-7 8 7v8a1 1 0 0 1-1 1h-4v-6H9v6H5a1 1 0 0 1-1-1z"/></svg><span>Home</span></button>
-    <button data-page="mouse" title="Mouse"><svg viewBox="0 0 24 24"><rect x="6" y="3" width="12" height="18" rx="6"/><path d="M12 7v4"/></svg><span>Mouse</span><i class="dot" id="dot-mouse"></i></button>
-    <button data-page="headset" title="Cuffie"><svg viewBox="0 0 24 24"><path d="M4 15v-3a8 8 0 0 1 16 0v3"/><rect x="3" y="14" width="4" height="6" rx="2"/><rect x="17" y="14" width="4" height="6" rx="2"/></svg><span>Cuffie</span><i class="dot" id="dot-headset"></i></button>
-    <button data-page="keyboard" title="Tastiera"><svg viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="3"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M7 14h10"/></svg><span>Tastiera</span><i class="dot" id="dot-keyboard"></i></button>
+    <button data-page="mouse" hidden title="Mouse"><svg viewBox="0 0 24 24"><rect x="6" y="3" width="12" height="18" rx="6"/><path d="M12 7v4"/></svg><span>Mouse</span><i class="dot" id="dot-mouse"></i></button>
+    <button data-page="headset" hidden title="Cuffie"><svg viewBox="0 0 24 24"><path d="M4 15v-3a8 8 0 0 1 16 0v3"/><rect x="3" y="14" width="4" height="6" rx="2"/><rect x="17" y="14" width="4" height="6" rx="2"/></svg><span>Cuffie</span><i class="dot" id="dot-headset"></i></button>
+    <button data-page="keyboard" hidden title="Tastiera"><svg viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="3"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M7 14h10"/></svg><span>Tastiera</span><i class="dot" id="dot-keyboard"></i></button>
     <button data-page="phone" title="Telefono"><svg viewBox="0 0 24 24"><rect x="7" y="2" width="10" height="20" rx="2.5"/><path d="M11 18h2"/></svg><span>Telefono</span><i class="dot" id="dot-phone"></i></button>
     <button data-page="audio" title="Audio"><svg viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/></svg><span>Audio</span></button>
     <button data-page="games" title="Giochi"><svg viewBox="0 0 24 24"><path d="M6 8h12a4 4 0 0 1 4 4v1.5a3.5 3.5 0 0 1-6.3 2.1L14.5 14h-5l-1.2 1.6A3.5 3.5 0 0 1 2 13.5V12a4 4 0 0 1 4-4z"/><path d="M7 11v3M5.5 12.5h3M16 11.5h.01M18 13h.01"/></svg><span>Giochi</span></button>

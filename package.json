@@ -1,15 +1,15 @@
 {
   "name": "unico",
   "productName": "Unico",
-  "version": "2.11.1",
-  "description": "Un solo programma per mouse Razer Basilisk V3 X HyperSpeed, cuffie Corsair HS80 RGB Wireless e tastiera AULA F75 Max",
+  "version": "2.12.0",
+  "description": "Unico adattato al PC di Raul: audio, batterie, telefono, giochi e strumenti di sistema",
   "main": "src/main.js",
   "author": "Hekat",
   "license": "UNLICENSED",
   "private": true,
   "scripts": {
     "start": "electron .",
-    "test": "node --test test/protocol.test.js test/drivers.test.js test/features.test.js test/batteries.test.js test/audiocheck.test.js test/history.test.js test/remote.test.js test/tools.test.js",
+    "test": "node --test test/devices.test.js test/features.test.js test/batteries.test.js test/audiocheck.test.js test/history.test.js test/remote.test.js test/tools.test.js",
     "icon": "node tools/make-icon.js",
     "dist": "electron-builder --win nsis zip --x64",
     "release": "electron-builder --win nsis zip --x64 --publish always"
@@ -67,7 +67,7 @@
     "publish": [
       {
         "provider": "github",
-        "owner": "Hekatisback",
+        "owner": "xelazz",
         "repo": "unico",
         "releaseType": "release"
       }
@@ -81,6 +81,6 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/Hekatisback/unico.git"
+    "url": "https://github.com/xelazz/unico.git"
   }
 }

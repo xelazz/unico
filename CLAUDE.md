@@ -1,11 +1,19 @@
 # Unico — istruzioni per Claude
 
 Unico è un'app Windows (Electron) che sostituisce i programmi dei produttori di periferiche e aggiunge
-strumenti di sistema. L'ha creata Hekat con Claude, ed è pensata per le sue periferiche:
+strumenti di sistema. L'ha creata Hekat con Claude; **questo fork è adattato al PC di Raul**, dove nessuna
+periferica ha un protocollo verificato, quindi non c'è nessun driver (`src/devices/none.js`):
 
-- mouse **Razer Basilisk V3 X HyperSpeed** (`src/devices/razer.js`)
-- cuffie **Corsair HS80 RGB Wireless** (`src/devices/hs80.js`)
-- tastiera **AULA F75 Max** (`src/devices/aula.js`)
+- tastiera + mouse sul ricevitore 2.4 GHz `1d57:fa60` (chip Xenta generico, marca non riconoscibile);
+- mouse Bluetooth "X11mouse": batteria letta da Windows, compare fra le batterie Bluetooth;
+- cuffie **Logitech G435** in Bluetooth: Logitech non espone niente in Bluetooth, HeadsetControl non le
+  supporta (Sapd/HeadsetControl#336); se un giorno si usa il ricevitore LIGHTSPEED, ricontrollare;
+- EarPods USB-C `05ac:110b`: a filo, niente da leggere.
+
+Le pagine Mouse, Cuffie e Tastiera, le loro schede in Home e "Luci di tutte le periferiche" sono nascoste
+(attributo `hidden`). I driver di Hekat (Razer Basilisk V3 X HyperSpeed, Corsair HS80, AULA F75 Max) sono
+stati tolti insieme ai loro test; il simulatore `test/fake-hid.js` elenca le periferiche di questo PC e
+rifiuta ogni apertura.
 
 Tutto il resto non dipende dalle periferiche e funziona su qualsiasi PC Windows 10/11: audio (uscita,
 volume per app, microfono con controllo e riparazione), batterie (pannello dall'icona, anelli sul bordo,

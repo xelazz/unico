@@ -17,7 +17,7 @@ Un solo programma per Windows al posto di iCUE, Razer Synapse e del driver AULA,
 
 ## Installazione
 
-Scarica `Unico-Setup-x.y.z.exe` dalla pagina [Releases](https://github.com/Hekatisback/unico/releases/latest) e aprilo. Windows può mostrare "PC protetto da Windows" perché il programma non è firmato: clicca **Ulteriori informazioni → Esegui comunque**. Serve solo la prima volta.
+Scarica `Unico-Setup-x.y.z.exe` dalla pagina [Releases](https://github.com/xelazz/unico/releases/latest) e aprilo. Windows può mostrare "PC protetto da Windows" perché il programma non è firmato: clicca **Ulteriori informazioni → Esegui comunque**. Serve solo la prima volta.
 
 Da lì in poi Unico si aggiorna da solo: controlla ogni 6 ore, scarica in silenzio e installa alla chiusura (o subito da Impostazioni → Aggiornamenti).
 
