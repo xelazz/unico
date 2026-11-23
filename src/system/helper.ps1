@@ -159,6 +159,27 @@ function Get-WifiInfo {
   return @{ raw = $out }
 }
 
+# scheda usata per Internet (quella della route predefinita): tipo, nome e velocità del collegamento
+function Get-NetLink {
+  $r = Get-NetRoute -DestinationPrefix '0.0.0.0/0' -ErrorAction SilentlyContinue | Sort-Object RouteMetric | Select-Object -First 1
+  if (-not $r) { return @{ online = $false } }
+  $ad = Get-NetAdapter -InterfaceIndex $r.ifIndex -ErrorAction SilentlyContinue
+  if (-not $ad) { return @{ online = $true; gateway = [string]$r.NextHop } }
+  $wifi = ($ad.PhysicalMediaType -match '802\.11') -or ($ad.InterfaceDescription -match 'Wi-?Fi|Wireless|WLAN')
+  $wlan = $null
+  if ($wifi) { $wlan = (netsh wlan show interfaces) -join "`n" }
+  return @{
+    online = $true
+    gateway = [string]$r.NextHop
+    name = [string]$ad.Name
+    desc = [string]$ad.InterfaceDescription
+    wifi = [bool]$wifi
+    rxBits = [double]$ad.ReceiveLinkSpeed
+    txBits = [double]$ad.TransmitLinkSpeed
+    wlan = $wlan
+  }
+}
+
 # ---------------------------------------------------------------- musica (Windows Media Control)
 function Initialize-Media {
   if ($script:media) { return }
@@ -395,6 +416,7 @@ while ($true) {
       'emptyRecycle' { Clear-RecycleBin -Force -ErrorAction SilentlyContinue; $true }
       'gateway' { Get-Gateway }
       'wifi' { Get-WifiInfo }
+      'netLink' { Get-NetLink }
       'media' { Get-Media }
       'mediaKey' { Send-MediaKey $a.key }
       'brightness' { Get-Brightness }

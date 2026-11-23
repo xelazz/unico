@@ -130,6 +130,15 @@ const sys = MOCK
   ? new (require('../test/fake-system').FakeSystem)({ onTick: (s) => onStats(s) })
   : new sysmod.SystemService({ scriptPath: helperScript, log, onTick: (s) => onStats(s) });
 let overlayWin = null;
+// Connessione Internet (pagina Sistema → Rete): ping, perdita di pacchetti, velocità
+const { NetMonitor, speedTest } = require('./system/netmon');
+const netmon = new NetMonitor({
+  probe: MOCK ? async () => (Math.random() < 0.02 ? null : 18 + Math.random() * 14) : undefined,
+  linkInfo: () => sys.netLink(),
+  rates: () => (sys.last && sys.last.net ? sys.last.net : null),
+  onTick: (n) => { if (win && !win.isDestroyed() && win.isVisible()) win.webContents.send('net', n); },
+  log,
+});
 
 function onStats(s) {
   feat.onSample && feat.onSample(s);
@@ -737,6 +746,21 @@ handle('sys:trash', async (p) => {
 });
 handle('sys:showFile', async (p) => { if (typeof p === 'string') shell.showItemInFolder(p); return { ok: true }; });
 handle('sys:network', async (host) => sys.network(host));
+handle('net:watch', async (on) => { netmon.want(!!on); return netmon.snapshot(); });
+let speedBusy = false;
+handle('net:speedtest', async () => {
+  if (speedBusy) return { ok: false, error: 'Test già in corso' };
+  speedBusy = true;
+  try {
+    const phase = (p) => { if (win && !win.isDestroyed()) win.webContents.send('net:phase', p); };
+    const r = MOCK
+      ? await new Promise((res) => { phase('download'); setTimeout(() => { phase('upload'); setTimeout(() => res({ ok: true, at: Date.now(), ping: 14, down: 187.4, up: 41.2, server: 'speed.cloudflare.com' }), 1500); }, 1500); })
+      : await speedTest({ onPhase: phase });
+    if (r.ok) netmon.speed = r;
+    log(`test velocità: ${r.ok ? `↓ ${r.down} Mbps ↑ ${r.up} Mbps, ping ${r.ping} ms` : r.error}`);
+    return r;
+  } catch (e) { return { ok: false, error: e.message }; } finally { speedBusy = false; }
+});
 handle('sys:power', async (mode) => (mode ? tools.powerSet(mode) : { ok: true, mode: await tools.powerGet() }));
 handle('sys:lock', async () => tools.lock());
 handle('sys:suspend', async () => { await sys.suspend(); return { ok: true }; });
@@ -857,7 +881,7 @@ const hex = (v) => (v || 0).toString(16).padStart(4, '0');
 // --- Avvio --------------------------------------------------------------------
 app.on('second-instance', showWindow);
 app.on('window-all-closed', (e) => e.preventDefault());
-app.on('will-quit', () => { remote.stop(); phone.stopAll(); sys.stop(); try { globalShortcut.unregisterAll(); } catch (e) {} });
+app.on('will-quit', () => { netmon.want(false); remote.stop(); phone.stopAll(); sys.stop(); try { globalShortcut.unregisterAll(); } catch (e) {} });
 app.on('before-quit', async (e) => {
   if (headset.ledTimer) {
     e.preventDefault();
@@ -898,6 +922,7 @@ app.whenReady().then(async () => {
   if (process.env.UNICO_SHOT3) captureNew(process.env.UNICO_SHOT3);
   if (process.env.UNICO_SHOT4) captureV26(process.env.UNICO_SHOT4);
   if (process.env.UNICO_SHOT5) captureV28(process.env.UNICO_SHOT5);
+  if (process.env.UNICO_SHOT6) captureNet(process.env.UNICO_SHOT6);
 });
 
 // Solo sviluppo: overlay e lettore musicale.
@@ -916,6 +941,23 @@ async function captureDemo(dir) {
 }
 
 // Solo sviluppo: batterie della 2.8 (pannello, anelli sul bordo, opzioni).
+// 2.13: Connessione Internet (Sistema → Rete), prima e dopo il test di velocità
+async function captureNet(dir) {
+  fs.mkdirSync(dir, { recursive: true });
+  const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+  win.show();
+  await wait(4000);
+  await win.webContents.executeJavaScript(`document.querySelector('nav button[data-page="system"]').click(); setTimeout(() => document.querySelector('[data-tabs="system"] button[data-tab="net"]').click(), 400);`);
+  await wait(9000);
+  fs.writeFileSync(path.join(dir, 'net.png'), (await win.webContents.capturePage()).toPNG());
+  await win.webContents.executeJavaScript(`document.querySelector('#in-speed').click();`);
+  await wait(1000);
+  fs.writeFileSync(path.join(dir, 'net-testing.png'), (await win.webContents.capturePage()).toPNG());
+  await wait(3500);
+  fs.writeFileSync(path.join(dir, 'net-speed.png'), (await win.webContents.capturePage()).toPNG());
+  app.exit(0);
+}
+
 async function captureV28(dir) {
   fs.mkdirSync(dir, { recursive: true });
   const wait = (ms) => new Promise((r) => setTimeout(r, ms));

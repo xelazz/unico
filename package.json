@@ -1,7 +1,7 @@
 {
   "name": "unico",
   "productName": "Unico",
-  "version": "2.12.0",
+  "version": "2.13.0",
   "description": "Unico adattato al PC di Raul: audio, batterie, telefono, giochi e strumenti di sistema",
   "main": "src/main.js",
   "author": "Hekat",
@@ -9,7 +9,7 @@
   "private": true,
   "scripts": {
     "start": "electron .",
-    "test": "node --test test/devices.test.js test/features.test.js test/batteries.test.js test/audiocheck.test.js test/history.test.js test/remote.test.js test/tools.test.js",
+    "test": "node --test test/devices.test.js test/netmon.test.js test/features.test.js test/batteries.test.js test/audiocheck.test.js test/history.test.js test/remote.test.js test/tools.test.js",
     "icon": "node tools/make-icon.js",
     "dist": "electron-builder --win nsis zip --x64",
     "release": "electron-builder --win nsis zip --x64 --publish always"

@@ -263,6 +263,76 @@ $('#net-run').onclick = async (e) => {
   $('#net-verdict').textContent = r.verdict;
 };
 
+// ---------------------------------------------------------------------------- Connessione Internet
+const netHist = { ping: [], rx: [], tx: [] };
+const fmtMbps = (bytesPerSec) => {
+  if (bytesPerSec == null) return '—';
+  const m = (bytesPerSec * 8) / 1e6;
+  return m >= 100 ? `${Math.round(m)} Mbps` : m >= 1 ? `${m.toFixed(1)} Mbps` : `${Math.round(m * 1000)} kbps`;
+};
+const pushHist = (arr, v) => { arr.push(v); if (arr.length > 120) arr.shift(); };
+const lvl = (ms) => (ms == null ? 'bad' : ms < 40 ? 'good' : ms < 100 ? 'mid' : 'bad');
+
+function renderNet(n) {
+  if (!n || currentPage !== 'system' || sysTab !== 'net') return;
+  const p = n.ping;
+  const last = n.samples.length ? n.samples[n.samples.length - 1] : undefined;
+  if (last !== undefined) pushHist(netHist.ping, last);
+  const box = $('#in-ping-box');
+  box.classList.remove('good', 'mid', 'bad');
+  if (p.count) box.classList.add(lvl(p.current));
+  $('#in-ping').textContent = !p.count ? '…' : p.current == null ? 'Nessuna risposta' : `${p.current} ms`;
+  $('#in-ping-sub').textContent = p.avg == null ? 'misurazione ogni secondo' : `media ${p.avg} ms · min ${p.min} · max ${p.max} · sbalzi ±${p.jitter ?? 0} ms (verso ${n.target})`;
+  const peak = Math.max(60, ...netHist.ping.map((x) => x || 0));
+  spark($('#sp-ping'), [netHist.ping.map((x) => (x == null ? peak : x))], { max: peak * 1.15, color: '#6d4dff' });
+
+  if (n.rates) { pushHist(netHist.rx, n.rates.rx); pushHist(netHist.tx, n.rates.tx); }
+  $('#in-rx').textContent = n.rates ? fmtMbps(n.rates.rx) : '—';
+  $('#in-tx').textContent = n.rates ? fmtMbps(n.rates.tx) : '—';
+  const top = Math.max(1, ...netHist.rx.map((x) => x || 0), ...netHist.tx.map((x) => x || 0));
+  spark($('#sp-inet'), [netHist.rx, netHist.tx], { max: top * 1.1, color: '#e8458b', color2: '#19b6ff' });
+
+  const lb = $('#in-loss-box');
+  lb.classList.remove('good', 'mid', 'bad');
+  if (p.count) lb.classList.add(p.loss === 0 ? 'good' : p.loss < 5 ? 'mid' : 'bad');
+  $('#in-loss').textContent = p.count ? `${p.loss}%` : '…';
+  $('#in-loss-sub').textContent = p.count ? `${Math.round((p.loss * p.count) / 100)} persi su ${p.count} nell'ultimo minuto` : 'nell\'ultimo minuto';
+
+  const l = n.link;
+  if (l) {
+    if (!l.online) { $('#in-link').textContent = 'Nessuna connessione a Internet'; $('#in-linkspeed').textContent = ''; }
+    else {
+      const kind = l.wifi ? `Wi-Fi${l.ssid ? ` «${l.ssid}»` : ''}${l.signal != null ? ` · segnale ${l.signal}%` : ''}` : 'Cavo di rete (Ethernet)';
+      $('#in-link').textContent = `${kind}${l.desc ? ` · ${l.desc}` : ''}`;
+      $('#in-linkspeed').textContent = l.rxMbps ? `Collegamento al router: ${l.rxMbps >= 1000 ? (l.rxMbps / 1000).toFixed(1) + ' Gbps' : Math.round(l.rxMbps) + ' Mbps'}` : '';
+    }
+  }
+  if (n.speed && !speedRunning) showSpeed(n.speed);
+  const v = $('#in-verdict');
+  v.className = `verdict ${n.verdict.level}`;
+  v.textContent = n.verdict.text;
+}
+api.onNet(renderNet);
+
+let speedRunning = false;
+function showSpeed(r) {
+  $('#in-speed-val').innerHTML = `<span class="in-down">↓</span> ${r.down ?? '—'} <small>Mbps</small> &nbsp; <span class="in-up">↑</span> ${r.up ?? '—'} <small>Mbps</small>`;
+  $('#in-speed-sub').textContent = `Ultimo test alle ${new Date(r.at).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' })} · ping ${r.ping} ms`;
+}
+api.onNetPhase((ph) => {
+  if (!speedRunning) return;
+  $('#in-speed-val').textContent = ph === 'download' ? 'Misuro il download…' : ph === 'upload' ? 'Misuro l\'upload…' : 'Preparazione…';
+});
+$('#in-speed').onclick = async (e) => {
+  speedRunning = true;
+  $('#in-speed-val').textContent = 'Preparazione…';
+  $('#in-speed-sub').textContent = 'Circa 15 secondi: durante il test il grafico del download sale, è normale.';
+  const r = await act(e.target, () => api.netSpeedtest());
+  speedRunning = false;
+  if (r && r.ok) showSpeed(r);
+  else { $('#in-speed-val').textContent = '—'; $('#in-speed-sub').textContent = (r && r.error) || 'Test non riuscito'; }
+};
+
 const ovCorner = chips($('#ov-corner'), (v) => act(null, () => api.overlaySet({ corner: v }), 'Overlay spostato'));
 $('#ov-on').onchange = () => act(null, () => api.overlaySet({ enabled: $('#ov-on').checked }));
 api.onOverlay((o) => { S.overlay = o.enabled; ovCorner.set(o.corner); extraRender(); });
@@ -273,10 +343,11 @@ function enterSystemTab(tab) {
   if (tab === 'procs') { loadProcs(); procTimer = setInterval(loadProcs, 3000); }
   if (tab === 'startup' && !startupLoaded) { startupLoaded = true; loadStartup(); }
   if (tab === 'clean' && !cleanLoaded) loadClean();
+  api.netWatch(tab === 'net').then((n) => { if (tab === 'net') renderNet(n); }).catch(() => {});
 }
 tabHooks.system = enterSystemTab;
 pageHooks.system = async (on) => {
-  if (!on) { clearInterval(procTimer); api.sysWatch(false); return; }
+  if (!on) { clearInterval(procTimer); api.sysWatch(false); api.netWatch(false); return; }
   const r = await api.sysWatch(true);
   enterSystemTab(tabs.system.get() || 'res');
   if (r && r.last) renderStats({ ...r.last, history: r.history });

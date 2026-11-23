@@ -31,6 +31,7 @@ senza gergo tecnico: spesso non è uno sviluppatore.
 | `src/devices/*.js` | un driver per periferica, solo HID (`node-hid`) |
 | `src/batteries/` | lista unica delle batterie, pannello, anelli sul bordo, storico |
 | `src/system/` | `helper.ps1` (un PowerShell sempre aperto), `audio.ps1`, `bt.ps1`, `audiocheck.js`, giochi, profili |
+| `src/system/netmon.js` | Connessione Internet (Sistema → Rete): ping TCP ogni secondo, perdita di pacchetti, collegamento, test di velocità (speed.cloudflare.com) |
 | `src/eq/apo.js` | equalizzatore tramite Equalizer APO |
 | `src/phone/` | scrcpy/adb |
 | `src/remote/` | controllo dal telefono (server nella rete locale) |

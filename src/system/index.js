@@ -293,6 +293,14 @@ class SystemService {
   async cleanupScan(downloads) { const r = await this.helper.call('cleanupScan', { downloads }, 120000); return { ...r, big: arr(r.big) }; }
   clearTemp() { return this.helper.call('clearTemp', {}, 120000); }
   emptyRecycle() { return this.helper.call('emptyRecycle', {}, 60000); }
+  // scheda usata per Internet: Wi-Fi o cavo, velocità del collegamento al router, rete e segnale
+  async netLink() {
+    const l = await this.helper.call('netLink', {}, 10000);
+    if (!l || !l.online) return { online: false };
+    const { parseWlan } = require('./netmon');
+    const w = l.wifi ? parseWlan(l.wlan) : {};
+    return { online: true, wifi: !!l.wifi, name: l.name || null, desc: l.desc || null, gateway: l.gateway || null, rxMbps: l.rxBits ? Math.round(l.rxBits / 1e5) / 10 : null, txMbps: l.txBits ? Math.round(l.txBits / 1e5) / 10 : null, ssid: w.ssid || null, signal: w.signal ?? null };
+  }
   async network(gameHost) {
     let gw = null;
     try { gw = await this.helper.call('gateway'); } catch (e) {}

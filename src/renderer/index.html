@@ -549,6 +549,17 @@
           </div>
         </div>
         <div class="tab" data-tab="net">
+          <div class="card glass" id="inet">
+            <div class="card-head"><div><h3>Connessione Internet</h3><p class="muted" id="in-link">Controllo della connessione…</p></div>
+              <button class="btn primary" id="in-speed">Test velocità</button></div>
+            <div class="inet-grid">
+              <div class="net-item" id="in-ping-box"><span class="muted">Ping e latenza</span><b id="in-ping">—</b><span class="muted" id="in-ping-sub">misurazione ogni secondo</span><canvas class="spark" id="sp-ping" height="60"></canvas></div>
+              <div class="net-item"><span class="muted">Download e upload adesso</span><b><span class="in-down">↓</span> <span id="in-rx">—</span></b><span class="muted"><span class="in-up">↑</span> <span id="in-tx">—</span> in upload</span><canvas class="spark" id="sp-inet" height="60"></canvas></div>
+              <div class="net-item"><span class="muted">Velocità della connessione</span><b id="in-speed-val">—</b><span class="muted" id="in-speed-sub">Premi "Test velocità" per misurarla</span><span class="muted" id="in-linkspeed"></span></div>
+              <div class="net-item" id="in-loss-box"><span class="muted">Perdita di pacchetti</span><b id="in-loss">—</b><span class="muted" id="in-loss-sub">nell'ultimo minuto</span></div>
+            </div>
+            <p class="verdict" id="in-verdict"></p>
+          </div>
           <div class="card glass">
             <div class="card-head"><div><h3>Diagnosi rete</h3><p class="muted">Misura il ritardo verso il router, internet e il server di gioco, e ti dice dove nasce il lag.</p></div>
               <div class="fields"><label class="field">Server di gioco <select id="net-game"><option value="104.160.141.3">League of Legends EUW</option><option value="1.1.1.1">Nessuno (solo internet)</option></select></label><button class="btn primary" id="net-run">Analizza</button></div></div>

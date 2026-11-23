@@ -54,6 +54,7 @@ class FakeSystem {
   }
   async clearTemp() { return { freed: 1.1e9 }; }
   async emptyRecycle() { return true; }
+  async netLink() { return { online: true, wifi: true, name: 'Wi-Fi', desc: 'Intel(R) Wi-Fi 6E AX211 160MHz', gateway: '192.168.1.1', rxMbps: 866.7, txMbps: 866.7, ssid: 'Casa', signal: 92 }; }
   async network() {
     return { results: [
       { label: 'Router di casa', host: '192.168.1.1', avg: 3, max: 5, loss: 0 },

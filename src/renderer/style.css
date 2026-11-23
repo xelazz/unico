@@ -641,3 +641,12 @@ input[type=range]::-webkit-slider-runnable-track { background: linear-gradient(9
 .rm-code { font: 700 22px/1 "Segoe UI Variable Display", "Segoe UI", sans-serif; letter-spacing: .08em; font-variant-numeric: tabular-nums; }
 .device[hidden] { display: none !important; }
 .lights-card[hidden] { display: none !important; }
+
+/* Connessione Internet (Sistema → Rete) */
+.inet-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+.inet-grid .spark { margin-top: 6px; }
+.net-item.good #in-ping, .net-item.good #in-loss { color: var(--ok); }
+.net-item.mid #in-ping, .net-item.mid #in-loss { color: var(--warn); }
+.net-item.bad #in-ping, .net-item.bad #in-loss { color: var(--bad); }
+.in-down { color: #e8458b; } .in-up { color: #19b6ff; }
+#in-verdict.good { color: var(--ok); } #in-verdict.mid { color: var(--warn); } #in-verdict.bad { color: var(--bad); }
